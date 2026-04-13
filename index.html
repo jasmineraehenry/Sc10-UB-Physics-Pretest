@@ -11,7 +11,7 @@
             --success: #27ae60;
             --error: #e74c3c;
             --bg: #f4f7f6;
-            --text: #000000; /* Black text for readability */
+            --text: #000000;
         }
 
         body {
@@ -33,9 +33,16 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             border-top: 10px solid var(--accent);
+            text-align: center;
         }
 
-        h1 { color: var(--primary); text-align: center; margin-bottom: 2rem; }
+        h1 { color: var(--primary); margin-bottom: 2rem; }
+
+        /* Initial Landing State */
+        #start-screen { display: block; padding: 20px; }
+        
+        /* Quiz State */
+        #quiz-ui { display: none; text-align: left; }
 
         .progress-bar {
             height: 12px;
@@ -52,7 +59,7 @@
             transition: width 0.4s ease;
         }
 
-        .question { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.4; }
+        .question { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--text); }
 
         .options { display: grid; gap: 12px; }
 
@@ -65,7 +72,6 @@
             text-align: left;
             font-size: 1.05rem;
             color: var(--text);
-            font-weight: 500;
             transition: all 0.2s ease;
         }
 
@@ -80,13 +86,13 @@
             border-radius: 10px;
             display: none;
             font-weight: 600;
-            line-height: 1.5;
+            border: 2px solid transparent;
         }
 
-        .correct { background: #d4edda; border: 2px solid var(--success); color: #155724; }
-        .incorrect { background: #f8d7da; border: 2px solid var(--error); color: #721c24; }
+        .correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .incorrect { background: #f8d7da; border-color: var(--error); color: #721c24; }
 
-        #next-btn, #restart-btn {
+        .control-btn {
             margin-top: 25px;
             padding: 14px 30px;
             background: var(--primary);
@@ -94,16 +100,16 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            display: none;
             width: 100%;
+            transition: opacity 0.2s;
         }
 
-        #results { display: none; text-align: center; }
+        .control-btn:hover { opacity: 0.9; }
+
+        #results { display: none; }
         .mistake-log { text-align: left; background: #fffbe6; border: 1px solid #ffe58f; padding: 20px; border-radius: 10px; margin-top: 25px; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -111,22 +117,27 @@
 <div id="quiz-container">
     <h1>Sc10 UB Physics Review</h1>
     
+    <div id="start-screen">
+        <p style="font-size: 1.1rem; margin-bottom: 2rem;">Welcome to the Unit B Physics Mastery Review.</p>
+        <button class="control-btn" onclick="startQuiz()">Start Review</button>
+    </div>
+
     <div id="quiz-ui">
         <div class="progress-bar"><div id="progress-fill"></div></div>
         <div id="question-text" class="question"></div>
         <div id="options-container" class="options"></div>
         <div id="feedback-area" class="feedback"></div>
-        <button id="next-btn">Next Question</button>
+        <button id="next-btn" class="control-btn" style="display:none;">Next Question</button>
     </div>
 
     <div id="results">
-        <h2>Quiz Complete!</h2>
-        <p style="font-size: 1.75rem; font-weight: bold;">Score: <span id="final-score"></span> / 25</p>
+        <h2>Review Complete</h2>
+        <p style="font-size: 1.75rem; font-weight: bold;">Final Score: <span id="final-score"></span> / 25</p>
         <div id="common-mistakes" class="mistake-log">
             <h3>Key Concepts to Review:</h3>
-            <ul id="mistake-list"></ul>
+            <ul id="mistake-list" style="color: black;"></ul>
         </div>
-        <button id="restart-btn" style="display:block;" onclick="location.reload()">Start New Attempt</button>
+        <button class="control-btn" onclick="location.reload()">Restart Quiz</button>
     </div>
 </div>
 
@@ -135,7 +146,7 @@
         { q: "An athlete runs 120 m [N] and then 50.0 m [E] in 25.0 s. What is the magnitude of average velocity?", a: "5.20 m/s", options: ["5.20 m/s", "6.80 m/s", "4.80 m/s", "130 m/s"], feedback: "Velocity uses displacement (straight-line distance), not total path distance." },
         { q: "A 450 g soccer ball moves at 22.0 m/s. What is its kinetic energy?", a: "109 J", options: ["109 J", "1.09 x 10^5 J", "4.95 J", "218 J"], feedback: "Always convert grams to kilograms (divide by 1000) for energy formulas." },
         { q: "A car accelerates from rest to 25.0 m/s in 6.20 s. What is the acceleration?", a: "4.03 m/s²", options: ["4.03 m/s²", "155 m/s²", "0.248 m/s²", "4.03 m/s"], feedback: "Acceleration is the rate of change of velocity: (vf - vi) / t." },
-        { q: "A 120 kg pallet is lifted 3.50 m. What is its gravitational potential energy?", a: "4.12 x 10^3 J", options: ["4.12 x 10^3 J", "420 J", "1.18 x 10^3 J", "34.3 J"], feedback: "Ep = mgh. Don't forget gravity is 9.81 m/s²." },
+        { q: "A 120 kg pallet is lifted 3.50 m. What is its gravitational potential energy?", a: "4.12 x 10^3 J", options: ["4.12 x 10^3 J", "420 J", "1.18 x 10^3 J", "34.3 J"], feedback: "Ep = mgh. Remember gravity is 9.81 m/s²." },
         { q: "Work required to push a crate 15.0 m with a force of 85.0 N?", a: "1.28 x 10^3 J", options: ["1.28 x 10^3 J", "5.67 J", "1.28 J", "100 J"], feedback: "Work is Force multiplied by Distance (W=Fd)." },
         { q: "Jet travels 850 km/h for 15.0 minutes. Distance traveled?", a: "213 km", options: ["213 km", "12,750 km", "56.7 km", "213,000 km"], feedback: "Time must be in hours (15 min = 0.25 h) to match speed in km/h." },
         { q: "At max height, an object's velocity is zero. What happened to the kinetic energy?", a: "Converted to Ep", options: ["Converted to Ep", "It was destroyed", "Converted to chemical", "Remained constant"], feedback: "Energy transforms from motion (Ek) into height/position (Ep)." },
@@ -163,19 +174,26 @@
     let score = 0;
     let mistakes = [];
 
+    const startScreen = document.getElementById('start-screen');
+    const quizUI = document.getElementById('quiz-ui');
     const qText = document.getElementById('question-text');
     const optionsCont = document.getElementById('options-container');
     const feedbackArea = document.getElementById('feedback-area');
     const nextBtn = document.getElementById('next-btn');
     const progressFill = document.getElementById('progress-fill');
 
-    // Shuffle Function
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
+    }
+
+    function startQuiz() {
+        startScreen.style.display = 'none';
+        quizUI.style.display = 'block';
+        loadQuestion();
     }
 
     function loadQuestion() {
@@ -186,7 +204,6 @@
         nextBtn.style.display = 'none';
         progressFill.style.width = `${(currentIdx / 25) * 100}%`;
 
-        // Shuffle the options before displaying them
         const shuffledOptions = shuffleArray([...q.options]);
 
         shuffledOptions.forEach(opt => {
@@ -230,10 +247,23 @@
     };
 
     function showResults() {
-        document.getElementById('quiz-ui').style.display = 'none';
+        quizUI.style.display = 'none';
         document.getElementById('results').style.display = 'block';
         document.getElementById('final-score').innerText = score;
         
         const list = document.getElementById('mistake-list');
         const uniqueMistakes = [...new Set(mistakes)];
-        if
+        if(uniqueMistakes.length > 0) {
+            uniqueMistakes.forEach(m => {
+                const li = document.createElement('li');
+                li.innerText = m;
+                list.appendChild(li);
+            });
+        } else {
+            document.getElementById('common-mistakes').innerHTML = "<h3>Perfect Score! You have a solid grasp of these concepts.</h3>";
+        }
+    }
+</script>
+
+</body>
+</html>
