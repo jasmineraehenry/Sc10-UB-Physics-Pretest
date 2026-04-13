@@ -11,7 +11,7 @@
             --success: #27ae60;
             --error: #e74c3c;
             --bg: #f4f7f6;
-            --text: #000000; /* Strict black text as requested */
+            --text: #000000; /* Black text for readability */
         }
 
         body {
@@ -27,21 +27,21 @@
 
         #quiz-container {
             background: white;
-            width: 90%;
+            width: 95%;
             max-width: 800px;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--accent);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-top: 10px solid var(--accent);
         }
 
         h1 { color: var(--primary); text-align: center; margin-bottom: 2rem; }
 
         .progress-bar {
-            height: 10px;
-            background: #eee;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 25px;
             overflow: hidden;
         }
 
@@ -49,54 +49,61 @@
             height: 100%;
             background: var(--accent);
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.4s ease;
         }
 
-        .question { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .question { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.4; }
 
-        .options { display: grid; gap: 10px; }
+        .options { display: grid; gap: 12px; }
 
         button.option-btn {
-            background: white;
-            border: 2px solid #ddd;
-            padding: 12px;
-            border-radius: 8px;
+            background: #ffffff;
+            border: 2px solid #cccccc;
+            padding: 14px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--text);
-            transition: all 0.2s;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
         button.option-btn:hover:not([disabled]) {
-            background: #f0f7ff;
+            background: #f1f8ff;
             border-color: var(--accent);
         }
 
         .feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
             display: none;
-            font-weight: 500;
+            font-weight: 600;
+            line-height: 1.5;
         }
 
-        .correct { background: #d4edda; border: 1px solid var(--success); }
-        .incorrect { background: #f8d7da; border: 1px solid var(--error); }
+        .correct { background: #d4edda; border: 2px solid var(--success); color: #155724; }
+        .incorrect { background: #f8d7da; border: 2px solid var(--error); color: #721c24; }
 
         #next-btn, #restart-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
+            margin-top: 25px;
+            padding: 14px 30px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
             display: none;
+            width: 100%;
         }
 
         #results { display: none; text-align: center; }
-        .mistake-log { text-align: left; background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .mistake-log { text-align: left; background: #fffbe6; border: 1px solid #ffe58f; padding: 20px; border-radius: 10px; margin-top: 25px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -114,42 +121,42 @@
 
     <div id="results">
         <h2>Quiz Complete!</h2>
-        <p style="font-size: 1.5rem;">Your Score: <span id="final-score"></span>/25</p>
+        <p style="font-size: 1.75rem; font-weight: bold;">Score: <span id="final-score"></span> / 25</p>
         <div id="common-mistakes" class="mistake-log">
-            <h3>Review of Common Mistakes:</h3>
+            <h3>Key Concepts to Review:</h3>
             <ul id="mistake-list"></ul>
         </div>
-        <button id="restart-btn" onclick="location.reload()">Restart Quiz</button>
+        <button id="restart-btn" style="display:block;" onclick="location.reload()">Start New Attempt</button>
     </div>
 </div>
 
 <script>
     const quizData = [
-        { q: "An athlete runs 120 m [N] and then 50.0 m [E] in 25.0 s. What is the magnitude of average velocity?", a: "5.20 m/s", options: ["5.20 m/s", "6.80 m/s", "4.80 m/s", "130 m/s"], feedback: "Remember: Velocity uses displacement (hypotenuse), not total distance." },
-        { q: "A 450 g soccer ball moves at 22.0 m/s. What is its kinetic energy?", a: "109 J", options: ["109 J", "1.09 x 10^5 J", "4.95 J", "218 J"], feedback: "Common mistake: Forgetting to convert grams to kilograms (divide by 1000)." },
-        { q: "A car accelerates from rest to 25.0 m/s in 6.20 s. What is the acceleration?", a: "4.03 m/s²", options: ["4.03 m/s²", "155 m/s²", "0.248 m/s²", "4.03 m/s"], feedback: "Acceleration is change in velocity divided by time." },
-        { q: "A 120 kg pallet is lifted 3.50 m. What is its gravitational potential energy?", a: "4.12 x 10^3 J", options: ["4.12 x 10^3 J", "420 J", "1.18 x 10^3 J", "34.3 J"], feedback: "Use Ep = mgh. Ensure you include gravity (9.81 m/s²)." },
-        { q: "Work required to push a crate 15.0 m with a force of 85.0 N?", a: "1.28 x 10^3 J", options: ["1.28 x 10^3 J", "5.67 J", "1.28 J", "100 J"], feedback: "Work = Force x Distance." },
-        { q: "Jet travels 850 km/h for 15.0 minutes. Distance traveled?", a: "213 km", options: ["213 km", "12,750 km", "56.7 km", "213,000 km"], feedback: "Convert minutes to hours (15/60) before multiplying." },
-        { q: "At max height, an object's velocity is zero. What happened to the Ek?", a: "Converted to Ep", options: ["Converted to Ep", "It was destroyed", "Converted to chemical", "Remained constant"], feedback: "Energy transforms from motion (Ek) to position (Ep) as an object rises." },
-        { q: "A 0.500 kg ball has 40.0 J of kinetic energy. What is its speed?", a: "12.6 m/s", options: ["12.6 m/s", "160 m/s", "8.94 m/s", "40.0 m/s"], feedback: "Rearrange Ek = 1/2mv² to v = sqrt(2Ek/m)." },
-        { q: "Distance traveled: 300 m [W] then 400 m [S]?", a: "700 m", options: ["700 m", "500 m", "100 m", "700 m [SW]"], feedback: "Distance is a scalar; add all segments together regardless of direction." },
-        { q: "Engine efficiency is 22.0%. It consumes 5000 J. Useful work done?", a: "1100 J", options: ["1100 J", "3900 J", "22,727 J", "110 J"], feedback: "Multiply input by efficiency in decimal form (0.22)." },
-        { q: "Train slows from 40.0 m/s to 10.0 m/s in 15.0 s. Acceleration?", a: "-2.00 m/s²", options: ["-2.00 m/s²", "2.00 m/s²", "-3.33 m/s²", "-450 m/s²"], feedback: "Acceleration is (Final - Initial) / time. Deceleration must be negative." },
-        { q: "Slope of a Position-Time graph represents:", a: "Velocity", options: ["Velocity", "Acceleration", "Distance", "Force"], feedback: "m/s is the unit for velocity; rise over run on p-t graph." },
-        { q: "Stored energy in a 60.0 kg object at 12.0 m height?", a: "7.06 x 10^3 J", options: ["7.06 x 10^3 J", "720 J", "589 J", "5.00 J"], feedback: "Use Ep = mgh." },
-        { q: "Walk 4.0m [N], 3.0m [E], 4.0m [S]. Final displacement?", a: "3.0 m [E]", options: ["3.0 m [E]", "11.0 m", "5.0 m [NE]", "0 m"], feedback: "Displacement is start-to-finish. North and South legs cancel out." },
-        { q: "System allowing energy flow but not matter flow:", a: "Closed system", options: ["Closed system", "Isolated system", "Open system", "Efficient system"], feedback: "Closed systems trap matter but let energy through." },
-        { q: "Time to run 2.70 km at 9.00 m/s in minutes?", a: "5.00 min", options: ["5.00 min", "300 min", "0.30 min", "24.3 min"], feedback: "Convert km to m (2700), find seconds (300), then convert to minutes (5)." },
-        { q: "Which is a vector quantity?", a: "Acceleration", options: ["Acceleration", "Time", "Energy", "Mass"], feedback: "Vectors require a magnitude AND a direction." },
-        { q: "Energy transformations always result in 'lost' energy as:", a: "Waste heat", options: ["Waste heat", "Matter", "Potential energy", "Gravity"], feedback: "Second Law of Thermodynamics: Entropy (heat) always increases." },
-        { q: "If mass doubles but speed stays the same, Ek will:", a: "Double", options: ["Double", "Quadruple", "Stay the same", "Half"], feedback: "Ek is directly proportional to mass." },
-        { q: "Work done holding a 100 kg barbell stationary?", a: "0 J", options: ["0 J", "981 J", "1000 J", "100 J"], feedback: "Physics Work = Force x Distance. No movement = No work." },
-        { q: "Input 800 J, Output 200 J. Percentage wasted as heat?", a: "75.0%", options: ["75.0%", "25.0%", "400%", "50.0%"], feedback: "25% was used (200/800), so 75% was wasted." },
-        { q: "Why was Savery’s engine inefficient?", a: "Repeatedly cooling the boiler", options: ["Repeatedly cooling the boiler", "Used electricity", "Too many parts", "Pressure too low"], feedback: "Constant reheating and cooling of the metal cylinder wastes fuel." },
-        { q: "Work done moving 12.0 m with a 5.00 N force?", a: "60.0 J", options: ["60.0 J", "20.0 J", "15.0 J", "1.25 J"], feedback: "W = Fd. Time is extra information here." },
-        { q: "Heat in 1000 J, Work out 300 J. Where is the 700 J?", a: "Internal energy/exhaust", options: ["Internal energy/exhaust", "Disappears", "Turns to mass", "Turns to gravity"], feedback: "Energy must be conserved (First Law)." },
-        { q: "Work done lifting 1.0 kg book 2.0 m?", a: "19.6 J", options: ["19.6 J", "2.0 J", "9.81 J", "0.50 J"], feedback: "Lifting work = mgh." }
+        { q: "An athlete runs 120 m [N] and then 50.0 m [E] in 25.0 s. What is the magnitude of average velocity?", a: "5.20 m/s", options: ["5.20 m/s", "6.80 m/s", "4.80 m/s", "130 m/s"], feedback: "Velocity uses displacement (straight-line distance), not total path distance." },
+        { q: "A 450 g soccer ball moves at 22.0 m/s. What is its kinetic energy?", a: "109 J", options: ["109 J", "1.09 x 10^5 J", "4.95 J", "218 J"], feedback: "Always convert grams to kilograms (divide by 1000) for energy formulas." },
+        { q: "A car accelerates from rest to 25.0 m/s in 6.20 s. What is the acceleration?", a: "4.03 m/s²", options: ["4.03 m/s²", "155 m/s²", "0.248 m/s²", "4.03 m/s"], feedback: "Acceleration is the rate of change of velocity: (vf - vi) / t." },
+        { q: "A 120 kg pallet is lifted 3.50 m. What is its gravitational potential energy?", a: "4.12 x 10^3 J", options: ["4.12 x 10^3 J", "420 J", "1.18 x 10^3 J", "34.3 J"], feedback: "Ep = mgh. Don't forget gravity is 9.81 m/s²." },
+        { q: "Work required to push a crate 15.0 m with a force of 85.0 N?", a: "1.28 x 10^3 J", options: ["1.28 x 10^3 J", "5.67 J", "1.28 J", "100 J"], feedback: "Work is Force multiplied by Distance (W=Fd)." },
+        { q: "Jet travels 850 km/h for 15.0 minutes. Distance traveled?", a: "213 km", options: ["213 km", "12,750 km", "56.7 km", "213,000 km"], feedback: "Time must be in hours (15 min = 0.25 h) to match speed in km/h." },
+        { q: "At max height, an object's velocity is zero. What happened to the kinetic energy?", a: "Converted to Ep", options: ["Converted to Ep", "It was destroyed", "Converted to chemical", "Remained constant"], feedback: "Energy transforms from motion (Ek) into height/position (Ep)." },
+        { q: "A 0.500 kg ball has 40.0 J of kinetic energy. What is its speed?", a: "12.6 m/s", options: ["12.6 m/s", "160 m/s", "8.94 m/s", "40.0 m/s"], feedback: "Isolate v: v = sqrt(2Ek / m)." },
+        { q: "Distance traveled: 300 m [W] then 400 m [S]?", a: "700 m", options: ["700 m", "500 m", "100 m", "700 m [SW]"], feedback: "Distance is a scalar sum of all path lengths regardless of direction." },
+        { q: "Engine efficiency is 22.0%. It consumes 5000 J. Useful work done?", a: "1100 J", options: ["1100 J", "3900 J", "22,727 J", "110 J"], feedback: "Useful work = Efficiency x Input (convert % to decimal first)." },
+        { q: "Train slows from 40.0 m/s to 10.0 m/s in 15.0 s. Acceleration?", a: "-2.00 m/s²", options: ["-2.00 m/s²", "2.00 m/s²", "-3.33 m/s²", "-450 m/s²"], feedback: "When an object slows down, its acceleration vector is negative." },
+        { q: "Slope of a Position-Time graph represents:", a: "Velocity", options: ["Velocity", "Acceleration", "Distance", "Force"], feedback: "The rate of change of position over time is velocity." },
+        { q: "Stored energy in a 60.0 kg object at 12.0 m height?", a: "7.06 x 10^3 J", options: ["7.06 x 10^3 J", "720 J", "589 J", "5.00 J"], feedback: "Calculate potential energy using Ep = mgh." },
+        { q: "Walk 4.0m [N], 3.0m [E], 4.0m [S]. Final displacement?", a: "3.0 m [E]", options: ["3.0 m [E]", "11.0 m", "5.0 m [NE]", "0 m"], feedback: "Displacement is the net change in position (Start to End point)." },
+        { q: "System allowing energy flow but not matter flow:", a: "Closed system", options: ["Closed system", "Isolated system", "Open system", "Efficient system"], feedback: "Closed systems exchange heat/work but trap matter inside." },
+        { q: "Time to run 2.70 km at 9.00 m/s in minutes?", a: "5.00 min", options: ["5.00 min", "300 min", "0.30 min", "24.3 min"], feedback: "Find total seconds (2700m / 9m/s) then divide by 60 for minutes." },
+        { q: "Which is a vector quantity?", a: "Acceleration", options: ["Acceleration", "Time", "Energy", "Mass"], feedback: "Vectors must include both magnitude and direction." },
+        { q: "Energy transformations always result in 'lost' energy as:", a: "Waste heat", options: ["Waste heat", "Matter", "Potential energy", "Gravity"], feedback: "Real systems always lose some usable energy as thermal energy (heat)." },
+        { q: "If mass doubles but speed stays the same, Ek will:", a: "Double", options: ["Double", "Quadruple", "Stay the same", "Half"], feedback: "Kinetic energy is directly proportional to mass." },
+        { q: "Work done holding a 100 kg barbell stationary?", a: "0 J", options: ["0 J", "981 J", "1000 J", "100 J"], feedback: "If there is no displacement, no work is performed (W = F x 0)." },
+        { q: "Input 800 J, Output 200 J. Percentage wasted as heat?", a: "75.0%", options: ["75.0%", "25.0%", "400%", "50.0%"], feedback: "Waste = (Total Input - Useful Output) / Total Input x 100." },
+        { q: "Why was Savery’s engine inefficient?", a: "Repeatedly cooling the boiler", options: ["Repeatedly cooling the boiler", "Used electricity", "Too many parts", "Pressure too low"], feedback: "Energy is wasted reheating the metal of the cylinder every cycle." },
+        { q: "Work done moving 12.0 m with a 5.00 N force?", a: "60.0 J", options: ["60.0 J", "20.0 J", "15.0 J", "1.25 J"], feedback: "Simply multiply Force by Distance (W=Fd)." },
+        { q: "Heat in 1000 J, Work out 300 J. Where is the 700 J?", a: "Internal energy/exhaust", options: ["Internal energy/exhaust", "Disappears", "Turns to mass", "Turns to gravity"], feedback: "First Law of Thermodynamics: Energy input = Work + Heat Exhaust." },
+        { q: "Work done lifting 1.0 kg book 2.0 m?", a: "19.6 J", options: ["19.6 J", "2.0 J", "9.81 J", "0.50 J"], feedback: "Work = mgh (lifting against gravity)." }
     ];
 
     let currentIdx = 0;
@@ -162,6 +169,15 @@
     const nextBtn = document.getElementById('next-btn');
     const progressFill = document.getElementById('progress-fill');
 
+    // Shuffle Function
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     function loadQuestion() {
         const q = quizData[currentIdx];
         qText.innerText = `${currentIdx + 1}. ${q.q}`;
@@ -170,7 +186,10 @@
         nextBtn.style.display = 'none';
         progressFill.style.width = `${(currentIdx / 25) * 100}%`;
 
-        q.options.forEach(opt => {
+        // Shuffle the options before displaying them
+        const shuffledOptions = shuffleArray([...q.options]);
+
+        shuffledOptions.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
@@ -188,12 +207,12 @@
         if(selected === q.a) {
             score++;
             feedbackArea.className = 'feedback correct';
-            feedbackArea.innerText = "Correct! " + q.feedback;
+            feedbackArea.innerHTML = "<strong>Correct!</strong><br>" + q.feedback;
             btn.style.borderColor = "var(--success)";
             btn.style.background = "#d4edda";
         } else {
             feedbackArea.className = 'feedback incorrect';
-            feedbackArea.innerText = "Incorrect. " + q.feedback;
+            feedbackArea.innerHTML = "<strong>Incorrect.</strong><br>" + q.feedback;
             btn.style.borderColor = "var(--error)";
             btn.style.background = "#f8d7da";
             mistakes.push(q.feedback);
@@ -217,19 +236,4 @@
         
         const list = document.getElementById('mistake-list');
         const uniqueMistakes = [...new Set(mistakes)];
-        if(uniqueMistakes.length > 0) {
-            uniqueMistakes.forEach(m => {
-                const li = document.createElement('li');
-                li.innerText = m;
-                list.appendChild(li);
-            });
-        } else {
-            document.getElementById('common-mistakes').innerHTML = "<h3>Perfect Score! You have a solid grasp of these concepts.</h3>";
-        }
-    }
-
-    loadQuestion();
-</script>
-
-</body>
-</html>
+        if
